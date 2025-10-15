@@ -11,12 +11,14 @@ public class MainContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        var conn = Environment.GetEnvironmentVariable("DATABASE_URL");
+        options.UseNpgsql("Host=ballast.proxy.rlwy.net;Port=57464;Database=railway;Username=postgres;Password=yiAeXngHQbHvpSImHDjoTjZDMEqCnKVt");
 
-        if (string.IsNullOrEmpty(conn))
-            throw new Exception("DATABASE_URL not found. Please set it in Railway Variables.");
+        //var conn = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-        options.UseNpgsql(conn);
+        //if (string.IsNullOrEmpty(conn))
+        //    throw new Exception("DATABASE_URL not found. Please set it in Railway Variables.");
+
+        //options.UseNpgsql(conn);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

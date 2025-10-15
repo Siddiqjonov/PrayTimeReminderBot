@@ -11,7 +11,7 @@ public static class Program
     {
         var settings = new BotSettings
         {
-            Token = Environment.GetEnvironmentVariable("BOT_TOKEN"),
+            Token = Environment.GetEnvironmentVariable("BOT_TOKEN") ?? "8201869983:AAFqvD_PUmWfCb_Ub_V-NN1oIiKt2APb1YI",
         };
 
         var bot = new TelegramBotClient(settings.Token);
