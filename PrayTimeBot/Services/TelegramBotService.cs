@@ -15,6 +15,8 @@ public class TelegramBotService(ITelegramBotClient bot, UserService userService,
 
     public async Task HandleUpdate(Update update)
     {
+        Console.WriteLine($"📩 Update received: {update.Type}");
+
         if (update.Message != null)
             await HandleMessage(update.Message);
         else if (update.CallbackQuery != null)
