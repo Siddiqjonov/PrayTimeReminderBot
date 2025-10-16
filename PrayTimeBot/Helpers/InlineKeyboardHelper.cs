@@ -2,38 +2,30 @@
 
 namespace PrayTimeBot.Helpers;
 
-public static class KeyboardHelper
+public static class InlineKeyboardHelper
 {
-    // Inline menu: only format & region
-    public static InlineKeyboardMarkup GetInlineMenu()
+    public static InlineKeyboardMarkup GetChangeFormatAndRegionKeyboard(bool format = true, bool region = true)
     {
-        return new InlineKeyboardMarkup(new[]
+        if (format && region)
         {
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData("O’zgarish format", "menu_change_format"),
-                InlineKeyboardButton.WithCallbackData("Hududni o’zgartirish", "menu_change_region")
-            }
-        });
-    }
-
-    // Non-inline buttons (just simple ReplyKeyboardMarkup)
-    public static ReplyKeyboardMarkup GetNonInlineMenu()
-    {
-        return new ReplyKeyboardMarkup(new KeyboardButton[][]
-        {
-        new KeyboardButton[]
-        {
-            new KeyboardButton("⏰ Namoz vaqtini o’zgartirish"),
-            new KeyboardButton("📅 Bugungi namoz vaqtlari")
+            return new InlineKeyboardMarkup(
+            [
+            [InlineKeyboardButton.WithCallbackData("🕓 Formatni o‘zgartirish", "change_format")],
+            [InlineKeyboardButton.WithCallbackData("📍 Hududni o‘zgartirish", "change_region")]
+            ]);
         }
-        })
+        else if (format && !region)
         {
-            ResizeKeyboard = true
-        };
+            return new InlineKeyboardMarkup(
+            [[InlineKeyboardButton.WithCallbackData("🕓 Formatni o‘zgartirish", "change_format")]]);
+        }
+        else
+        {
+            return new InlineKeyboardMarkup(
+            [[InlineKeyboardButton.WithCallbackData("📍 Hududni o‘zgartirish", "change_region")]]);
+        }
     }
 
-    // Region keyboard for first selection
     public static InlineKeyboardMarkup GetRegionKeyboard()
     {
         var rows = new List<InlineKeyboardButton[]>

@@ -1,5 +1,4 @@
-﻿using PrayTimeBot.Configuraitons;
-using PrayTimeBot.Infrastructure;
+﻿using PrayTimeBot.Infrastructure;
 using PrayTimeBot.Services;
 using Telegram.Bot;
 
@@ -9,12 +8,15 @@ public static class Program
 {
     public static async Task Main(string[] args)
     {
-        var settings = new BotSettings
-        {
-            Token = Environment.GetEnvironmentVariable("BOT_TOKEN") ?? "8201869983:AAFqvD_PUmWfCb_Ub_V-NN1oIiKt2APb1YI"
-        };
+        var token = Environment.GetEnvironmentVariable("BOT_TOKEN")?.Trim();
 
-        var bot = new TelegramBotClient(settings.Token);
+        if (string.IsNullOrEmpty(token))
+        {
+            Console.WriteLine("❌ BOT_TOKEN missing or invalid. Set BOT_TOKEN env var (no quotes).");
+            return;
+        }
+
+        var bot = new TelegramBotClient(token);
 
         try
         {
@@ -24,14 +26,13 @@ public static class Program
         catch (Exception ex)
         {
             Console.WriteLine($"❌ GetMe failed: {ex.Message}");
-            throw;
+            return;
         }
 
         try
         {
             var wh = await bot.GetWebhookInfo();
             Console.WriteLine($"🔗 Webhook URL: {wh.Url ?? "<none>"}  Pending: {wh.PendingUpdateCount}");
-
             if (!string.IsNullOrEmpty(wh.Url))
             {
                 Console.WriteLine("🗑 Deleting existing webhook to allow polling...");
@@ -40,7 +41,7 @@ public static class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ GetWebhookInfo/DeleteWebhook failed: {ex.Message}");
+            Console.WriteLine($"❌ Webhook check/delete failed: {ex.Message}");
         }
 
         using var db = new MainContext();
@@ -50,20 +51,19 @@ public static class Program
 
         Console.WriteLine("▶️ Starting receiving...");
         bot.StartReceiving(
-         async (client, update, ct) =>
-         {
-             Console.WriteLine($"📩 Update received: {update?.Type}");
-             await botService.HandleUpdate(update);
-         },
-         async (client, exception, errorSource, ct) =>
-         {
-             Console.WriteLine($"Error in receiver: {exception.Message} (source: {errorSource})");
-             await Task.CompletedTask;
-         });
-
+            async (client, update, ct) =>
+            {
+                Console.WriteLine($"📩 Update received: {update?.Type}");
+                await botService.HandleUpdate(update!);
+            },
+            async (client, exception, errorSource, ct) =>
+            {
+                Console.WriteLine($"Error in receiver: {exception.Message} (source: {errorSource})");
+                await Task.CompletedTask;
+            }
+        );
         Console.WriteLine("✅ StartReceiving called.");
 
-        // keep container alive
         Thread.Sleep(Timeout.Infinite);
     }
 }

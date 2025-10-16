@@ -1,5 +1,4 @@
-﻿using PrayTimeBot.Configuraitons;
-using PrayTimeBot.Helpers;
+﻿using PrayTimeBot.Helpers;
 using PrayTimeBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -10,13 +9,12 @@ namespace PrayTimeBot.BotHandler;
 
 internal static class CommandHandler
 {
-    private static ITelegramBotClient? _bot;
     private static UserService? _userService;
+    private static ITelegramBotClient? _bot;
     private static PrayerTimeService? _prayerTimeService;
 
-    public static void InitializeBotClient(ITelegramBotClient bot) => _bot = bot;
-    public static void InitializeUserService(UserService userService) => _userService = userService;
-    public static void InitializePrayerTimeService(PrayerTimeService prayerTimeService) => _prayerTimeService = prayerTimeService;
+    public static void InitializeServices(ITelegramBotClient? bot, UserService? userService, PrayerTimeService prayerTimeService)
+    { _prayerTimeService = prayerTimeService; _bot = bot; _userService = userService; }
 
     public static async Task HandleStartAsync(Message message)
     {
@@ -36,7 +34,7 @@ internal static class CommandHandler
         await _bot!.SendMessage(
             chatId,
             "O‘zingizga kerakli viloyatni tanlang:",
-            replyMarkup: KeyboardHelper.GetRegionKeyboard()
+            replyMarkup: InlineKeyboardHelper.GetRegionKeyboard()
         );
     }
 

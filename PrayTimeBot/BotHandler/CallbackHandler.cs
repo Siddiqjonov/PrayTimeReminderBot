@@ -1,5 +1,4 @@
 ﻿using PrayTimeBot.Helpers;
-using PrayTimeBot.Infrastructure;
 using PrayTimeBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -13,14 +12,8 @@ internal static class CallbackHandler
     private static ITelegramBotClient? _bot;
     private static PrayerTimeService? _prayerTimeService;
 
-    public static void InitializePrayerTimeService(PrayerTimeService prayerTimeService)
-       => _prayerTimeService = prayerTimeService ?? throw new ArgumentNullException(nameof(prayerTimeService));
-
-    public static void InitializeUserService(UserService userService)
-        => _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-
-    public static void InitializeBotClient(ITelegramBotClient bot)
-        => _bot = bot ?? throw new ArgumentNullException(nameof(bot));
+    public static void InitializeServices(ITelegramBotClient? bot, UserService? userService, PrayerTimeService prayerTimeService)
+    { _prayerTimeService = prayerTimeService; _bot = bot; _userService = userService; }
 
     public static async Task HandleRegionSelectionAsync(CallbackQuery query)
     {
@@ -32,15 +25,14 @@ internal static class CallbackHandler
         var time = await _prayerTimeService!.GetTodayAsync(city);
         if (time == null)
         {
-            await _bot!.EditMessageText(chatId, query.Message.MessageId, "❌ Namoz vaqtlari olinmadi.");
+            await _bot!.EditMessageText(
+            chatId,
+            query.Message.MessageId,
+            "❌ Namoz vaqtlari olinmadi.\nIltimos boshqa viloyatni tanlang.",
+            replyMarkup: InlineKeyboardHelper.GetChangeFormatAndRegionKeyboard(format: false)
+            );
             return;
         }
-
-        var inlineButtons = new InlineKeyboardMarkup(new[]
-        {
-        new[] { InlineKeyboardButton.WithCallbackData("🕓 Formatni o‘zgartirish", "change_format") },
-        new[] { InlineKeyboardButton.WithCallbackData("📍 Hududni o‘zgartirish", "change_region") }
-        });
 
         var user = _userService.GetOrCreate(chatId, null, null);
         string text = user.Format switch
@@ -52,23 +44,32 @@ internal static class CallbackHandler
             _ => PrayerTimeFormatter.ClassicFormat(time)
         };
 
-        //await _bot!.EditMessageText(
-        //    chatId,
-        //    query.Message.MessageId,
-        //    text,
-        //    parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown,
-        //    replyMarkup: inlineButtons
-        //);
+        var reply = InlineKeyboardHelper.GetChangeFormatAndRegionKeyboard();
 
-        await _bot!.DeleteMessage(chatId, query.Message.MessageId);
-
-        await _bot!.SendMessage(
-            chatId,
-            text,
-            parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown,
-            replyMarkup: inlineButtons
-        );
-
+        try
+        {
+            await _bot!.EditMessageText(
+                chatId,
+                query.Message.MessageId,
+                text,
+                parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown,
+                replyMarkup: reply
+            );
+        }
+        catch (Telegram.Bot.Exceptions.ApiRequestException ex) when (ex.Message?.Contains("message is not modified") == true)
+        {
+            Console.WriteLine($"Edit skipped (not modified): {ex.Message}");
+        }
+        catch (Exception)
+        {
+            await _bot!.DeleteMessage(chatId, query.Message.MessageId);
+            await _bot!.SendMessage(
+                chatId,
+                text,
+                parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown,
+                replyMarkup: reply
+            );
+        }
     }
 
     public static async Task HandleRegionChangeRequestAsync(CallbackQuery query)
@@ -79,7 +80,7 @@ internal static class CallbackHandler
             chatId,
             query.Message.MessageId,
             "♻️ Iltimos, yangi viloyatni tanlang:",
-            replyMarkup: KeyboardHelper.GetRegionKeyboard()
+            replyMarkup: InlineKeyboardHelper.GetRegionKeyboard()
         );
     }
 
