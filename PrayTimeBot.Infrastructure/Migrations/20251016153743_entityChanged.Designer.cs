@@ -12,8 +12,8 @@ using PrayTimeBot.Infrastructure;
 namespace PrayTimeBot.Infrastructure.Migrations
 {
     [DbContext(typeof(MainContext))]
-    [Migration("20251016153424_entityChangedCreatedAt")]
-    partial class entityChangedCreatedAt
+    [Migration("20251016153743_entityChanged")]
+    partial class entityChanged
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,9 +89,7 @@ namespace PrayTimeBot.Infrastructure.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("NOW()");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("FirstName")
                         .HasMaxLength(100)
