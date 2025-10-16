@@ -14,7 +14,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         entity.Property(u => u.FirstName).HasMaxLength(100);
         entity.Property(u => u.City).HasMaxLength(100);
         entity.Property(u => u.LanguageCode).HasMaxLength(10);
-        entity.Property(u => u.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-        entity.Property(u => u.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP"); // ✅
+        entity.Property(x => x.CreatedAt).HasDefaultValueSql("NOW()");
     }
 }
