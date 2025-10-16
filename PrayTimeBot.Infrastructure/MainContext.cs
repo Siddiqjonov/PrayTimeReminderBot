@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using PrayTimeBot.Domain;
 using PrayTimeBot.Infrastructure.Configurations;
 

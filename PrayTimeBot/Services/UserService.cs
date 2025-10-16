@@ -28,6 +28,7 @@ public class UserService
             SendReminders = true,
             Format = 1,
             ReminderHour = 4,
+            CreatedAt = DateTime.UtcNow,
         };
 
         await _mainContext.Users.AddAsync(user);
@@ -49,6 +50,8 @@ public class UserService
             Format = 1,
             CreatedAt = DateTime.UtcNow,
             SendReminders = true,
+            ReminderHour= 4,
+            
         };
 
         _mainContext.Users.Add(user);

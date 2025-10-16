@@ -12,8 +12,8 @@ using PrayTimeBot.Infrastructure;
 namespace PrayTimeBot.Infrastructure.Migrations
 {
     [DbContext(typeof(MainContext))]
-    [Migration("20251015150021_AddReminderHourToUser")]
-    partial class AddReminderHourToUser
+    [Migration("20251016155521_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,9 +81,6 @@ namespace PrayTimeBot.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("Birthday")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<long>("ChatId")
                         .HasColumnType("bigint");
 
@@ -94,7 +91,7 @@ namespace PrayTimeBot.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasDefaultValueSql("NOW()");
 
                     b.Property<string>("FirstName")
                         .HasMaxLength(100)

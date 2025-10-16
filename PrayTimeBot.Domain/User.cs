@@ -14,5 +14,5 @@ public class User
     public bool SendReminders { get; set; }      // Namoz or daily reminder setting
     public int Format { get; set; } = 1;         // Time format
     public int? ReminderHour { get; set; }       // ⏱️ Reminder hour (0–23)
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // When user joined
+    public DateTime CreatedAt { get; set; }      // When user joined
 }

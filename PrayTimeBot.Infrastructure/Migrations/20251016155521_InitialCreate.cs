@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace PrayTimeBot.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -45,9 +45,10 @@ namespace PrayTimeBot.Infrastructure.Migrations
                     FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     City = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     LanguageCode = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
-                    Birthday = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     SendReminders = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    Format = table.Column<int>(type: "integer", nullable: false),
+                    ReminderHour = table.Column<int>(type: "integer", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
                 },
                 constraints: table =>
                 {
