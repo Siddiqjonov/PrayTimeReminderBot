@@ -6,9 +6,8 @@ namespace PrayTimeBot.Services;
 public class PrayerTimeService
 {
     private readonly HttpClient _http = new();
-
-    // ✅ Gets today’s prayer times from islomapi.uz
-    public async Task<PrayerTime?> GetTodayAsync(string city)
+    
+    public async Task<PrayerTime?> GetTodaysPrayTimeAsync(string city)
     {
         var url = $"https://islomapi.uz/api/present/day?region={city}";
 
@@ -39,7 +38,6 @@ public class PrayerTimeService
     }
 }
 
-// === Response Models for islomapi.uz ===
 public class IslomApiResponse
 {
     public string region { get; set; } = "";

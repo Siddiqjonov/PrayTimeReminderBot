@@ -22,7 +22,6 @@ internal static class CommandHandler
         var telegramId = message.From?.Id;
         var chatId = message.Chat.Id;
 
-        // 1️⃣ Greeting message
         await _bot!.SendMessage(
             chatId,
             $"👋 Assalomu alaykum [{firstName}](tg://user?id={telegramId})!",
@@ -30,12 +29,13 @@ internal static class CommandHandler
             parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown
         );
 
-        // 2️⃣ Prompt with inline region keyboard
         await _bot!.SendMessage(
             chatId,
             "O‘zingizga kerakli viloyatni tanlang:",
             replyMarkup: InlineKeyboardHelper.GetRegionKeyboard()
         );
+
+        _userService.CreateUser(message);
     }
 
     public static async Task HandleTodaysPrayTimeAsync(Message message)
@@ -43,7 +43,7 @@ internal static class CommandHandler
         var chatId = message.Chat.Id;
 
         var user = _userService!.GetOrCreate(chatId, null, null);
-        var time = await _prayerTimeService!.GetTodayAsync(user.City);
+        var time = await _prayerTimeService!.GetTodaysPrayTimeAsync(user.City);
 
         if (time == null)
         {

@@ -11,7 +11,6 @@ public class User
     public string? FirstName { get; set; }       // User’s first name
     public string? City { get; set; }            // For prayer or timezone
     public string? LanguageCode { get; set; }    // e.g. "uz", "ru", "en"
-    public DateTime? Birthday { get; set; }      // Optional user birthday
     public bool SendReminders { get; set; }      // Namoz or daily reminder setting
     public int Format { get; set; } = 1;         // Time format
     public int? ReminderHour { get; set; }       // ⏱️ Reminder hour (0–23)

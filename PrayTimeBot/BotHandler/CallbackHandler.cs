@@ -22,7 +22,7 @@ internal static class CallbackHandler
 
         _userService!.UpdateRegion(chatId, city);
 
-        var time = await _prayerTimeService!.GetTodayAsync(city);
+        var time = await _prayerTimeService!.GetTodaysPrayTimeAsync(city);
         if (time == null)
         {
             await _bot!.EditMessageText(
@@ -113,7 +113,7 @@ internal static class CallbackHandler
         _userService!.UpdateFormat(chatId, selected);
 
         var user = _userService.GetOrCreate(chatId, null, null);
-        var time = await _prayerTimeService!.GetTodayAsync(user.City);
+        var time = await _prayerTimeService!.GetTodaysPrayTimeAsync(user.City);
 
         if (time == null)
         {

@@ -1,4 +1,5 @@
-﻿using PrayTimeBot.Infrastructure;
+﻿using Microsoft.EntityFrameworkCore;
+using PrayTimeBot.Infrastructure;
 using PrayTimeBot.Services;
 using Telegram.Bot;
 
@@ -44,8 +45,9 @@ public static class Program
             Console.WriteLine($"❌ Webhook check/delete failed: {ex.Message}");
         }
 
-        using var db = new MainContext();
-        var userService = new UserService(db);
+        using var mainContect = new MainContext();
+        await mainContect.Database.MigrateAsync();
+        var userService = new UserService(mainContect);
         var prayService = new PrayerTimeService();
         var botService = new TelegramBotService(bot, userService, prayService);
 
