@@ -50,6 +50,7 @@ public static class Program
         var userService = new UserService(mainContect);
         var prayService = new PrayerTimeService();
         var botService = new TelegramBotService(bot, userService, prayService);
+        using var reminderService = new ReminderService(bot, prayService);
 
         Console.WriteLine("▶️ Starting receiving...");
         bot.StartReceiving(

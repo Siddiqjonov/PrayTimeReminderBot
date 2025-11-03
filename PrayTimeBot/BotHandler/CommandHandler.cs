@@ -26,7 +26,7 @@ internal static class CommandHandler
             chatId,
             $"👋 Assalomu alaykum [{firstName}](tg://user?id={telegramId})!",
             replyMarkup: ReplyKeyboardHelper.GetMainMenuKeyboard(),
-            parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown
+            parseMode: ParseMode.Markdown
         );
 
         await _bot!.SendMessage(
@@ -35,19 +35,26 @@ internal static class CommandHandler
             replyMarkup: InlineKeyboardHelper.GetRegionKeyboard()
         );
 
-        _userService.CreateUser(message);
+        var user = await _userService!.GetUserById(chatId);
+        if (user is null)
+            await _userService!.CreateUser(message);
     }
 
     public static async Task HandleTodaysPrayTimeAsync(Message message)
     {
         var chatId = message.Chat.Id;
 
-        var user = _userService!.GetOrCreate(chatId, null, null);
-        var time = await _prayerTimeService!.GetTodaysPrayTimeAsync(user.City);
+        var user = await _userService!.GetUserById(chatId);
+        var time = await _prayerTimeService!.GetTodaysPrayTimeAsync(user!.City!);
 
         if (time == null)
         {
-            await _bot!.SendMessage(chatId, "❌ Namoz vaqtlari olinmadi.");
+            await _bot!.SendMessage(
+                chatId, 
+                "❌ Namoz vaqtlari olinmadi.\nIltimos, menudagi \"⏰Bugungi nomoz vaqtlari\" tugmasini qayta bosing",
+                replyMarkup: ReplyKeyboardHelper.GetMainMenuKeyboard(),
+                parseMode: ParseMode.Markdown
+                );
             return;
         }
 
@@ -60,26 +67,21 @@ internal static class CommandHandler
             _ => PrayerTimeFormatter.ClassicFormat(time)
         };
 
-        var inlineButtons = new InlineKeyboardMarkup(new[]
-        {
-        new[] { InlineKeyboardButton.WithCallbackData("🕓 Formatni o‘zgartirish", "change_format") },
-        new[] { InlineKeyboardButton.WithCallbackData("📍 Hududni o‘zgartirish", "change_region") }
-        });
-
         await _bot!.SendMessage(
             chatId,
             text,
             parseMode: ParseMode.Markdown,
-            replyMarkup: inlineButtons
+            replyMarkup: InlineKeyboardHelper.GetChangeFormatAndRegionKeyboard()
         );
     }
+
     public static async Task HandleChangeReminderTimeAsync(Message message)
     {
         var chatId = message.Chat.Id;
 
         var buttons = Enumerable.Range(0, 24)
             .Select(h => InlineKeyboardButton.WithCallbackData($"{h:00}:00", $"reminder_{h}"))
-            .Chunk(4) // 🔥 6 rows, each with 4 buttons
+            .Chunk(4)
             .Select(chunk => chunk.ToArray())
             .ToArray();
 
