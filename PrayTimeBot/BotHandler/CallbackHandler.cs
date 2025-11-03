@@ -34,7 +34,7 @@ internal static class CallbackHandler
             return;
         }
 
-        var user = _userService.GetOrCreate(chatId, null, null);
+        var user = await _userService.GetUserById(chatId);
         string text = user.Format switch
         {
             2 => PrayerTimeFormatter.ElegantFormat(time),
@@ -112,7 +112,7 @@ internal static class CallbackHandler
 
         _userService!.UpdateFormat(chatId, selected);
 
-        var user = _userService.GetOrCreate(chatId, null, null);
+        var user = await _userService.GetUserById(chatId);
         var time = await _prayerTimeService!.GetTodaysPrayTimeAsync(user.City);
 
         if (time == null)
