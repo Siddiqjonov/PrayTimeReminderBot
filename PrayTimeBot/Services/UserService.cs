@@ -29,9 +29,23 @@ public class UserService(MainContext mainContext)
         return user.ChatId;
     }
 
-    public async Task<Domain.User?> GetUserById(long chatId) =>
-         await _mainContext.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
-    
+    public async Task<Domain.User?> GetUserById(long chatId)
+    {
+        var users = await _mainContext.Users
+            .Where(u => u.ChatId == chatId)
+            .ToListAsync();
+
+        if (users.Count > 1)
+        {
+            var keep = users.FirstOrDefault();
+            var duplicates = users.Skip(1).ToList();
+            _mainContext.Users.RemoveRange(duplicates);
+            await _mainContext.SaveChangesAsync();
+            return keep;
+        }
+
+        return users.FirstOrDefault();
+    }
 
     public void UpdateRegion(long chatId, string city)
     {
